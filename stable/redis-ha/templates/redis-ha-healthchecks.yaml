@@ -39,3 +39,13 @@ data:
         echo "Server check failed with: $CHECK_SERVER"
         exit 1
     fi
+  liveness.sh: |
+    #!/bin/sh
+    set -eu
+    CHECK_SERVER="$(redis-cli -p "$1" ping)"
+    EMPTY_IF_IS_LOADING=${CHECK_SERVER##*LOADING*}
+
+    if [[ "$CHECK_SERVER" != "PONG" && ! -z "$EMPTY_IF_IS_LOADING" ]]; then
+        echo "Server check failed with: $CHECK_SERVER"
+        exit 1
+    fi
